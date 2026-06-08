@@ -1,0 +1,36 @@
+{
+  "name": "kiwi-board",
+  "version": "1.0.0",
+  "description": "Kiwi Board — your personal library & file organizer",
+  "main": "src/main/main.js",
+  "author": "Kiwi",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.kiwi.kiwiboard",
+    "productName": "Kiwi Board",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ]
+  }
+}

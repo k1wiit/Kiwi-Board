@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiwi Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <!-- ── SPLASH ── -->
+  <div id="splash">
+    <div class="splash-grid"></div>
+    <div class="splash-center">
+      <div class="splash-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="38" height="38" rx="10" stroke="white" stroke-width="1.2" opacity="0.15"/>
+          <path d="M13 20L20 12L27 20L20 28Z" stroke="white" stroke-width="1.4" fill="none"/>
+          <circle cx="20" cy="20" r="3" fill="white" opacity="0.9"/>
+        </svg>
+      </div>
+      <span class="splash-name">Kiwi Board</span>
+      <div class="splash-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── APP ── -->
+  <div id="app" class="hidden">
+
+    <!-- TOP CHROME: titlebar + tab bar combined -->
+    <div class="chrome">
+      <!-- macOS traffic lights on the LEFT -->
+      <div class="traffic-lights" id="traffic-lights">
+        <button class="tl tl-close" id="btn-close" title="Close">
+          <svg class="tl-icon" viewBox="0 0 8 8" fill="none">
+            <path d="M1.5 1.5l5 5M6.5 1.5l-5 5" stroke="#4a0000" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="tl tl-min" id="btn-min" title="Minimize">
+          <svg class="tl-icon" viewBox="0 0 8 8" fill="none">
+            <path d="M1.5 4h5" stroke="#4a3000" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="tl tl-max" id="btn-max" title="Maximize">
+          <svg class="tl-icon" viewBox="0 0 8 8" fill="none">
+            <path d="M2 2l4 0 0 4M2 6l4-4" stroke="#0a3a00" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="chrome-drag"></div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar" id="tab-bar">
+        <div class="tab home-tab active" id="home-tab" data-id="home">
+          <svg class="tab-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M2 6.5L8 2L14 6.5V14H10V10H6V14H2V6.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+          <span>Home</span>
+        </div>
+        <!-- dynamic plugin tabs injected here -->
+        <div id="plugin-tabs"></div>
+        <button class="tab-add-btn" id="tab-add-btn" title="Upload plugin">
+          <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- tab bar ends -->
+      </div>
+    </div>
+
+    <!-- BODY: sidebar + main -->
+    <div class="body">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-tabs">
+          <button class="stab active" data-stab="plugins">Plugins</button>
+          <button class="stab" data-stab="folders">Folders</button>
+        </div>
+
+        <!-- Plugins list -->
+        <div class="stab-panel active" id="stab-plugins">
+          <div class="sidebar-list" id="plugin-list">
+            <!-- filled by JS -->
+          </div>
+        </div>
+
+        <!-- Folders tree -->
+        <div class="stab-panel" id="stab-folders">
+          <div class="sidebar-list" id="folder-tree">
+            <!-- filled by JS -->
+          </div>
+          <button class="sidebar-add-btn" id="btn-new-folder">
+            <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            New Folder
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN VIEW -->
+      <main class="main" id="main">
+        <!-- HOME PAGE -->
+        <div class="page" id="page-home">
+          <div class="home-header">
+            <div>
+              <h1 class="home-title">Plugins</h1>
+              <p class="home-sub">Your installed tools & applications</p>
+            </div>
+            <button class="btn-upload" id="btn-upload-plugin">
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                <path d="M8 10V3M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              Upload Plugin
+            </button>
+          </div>
+
+          <div class="plugin-grid" id="plugin-grid">
+            <!-- plugin cards -->
+          </div>
+
+          <div class="home-empty hidden" id="home-empty">
+            <div class="empty-icon">
+              <svg viewBox="0 0 48 48" fill="none" width="40" height="40">
+                <rect x="4" y="4" width="40" height="40" rx="8" stroke="white" stroke-width="1" opacity="0.1"/>
+                <path d="M24 30V18M19 23l5-5 5 5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+              </svg>
+            </div>
+            <p class="empty-title">No plugins yet</p>
+            <p class="empty-body">Upload a plugin folder to get started.</p>
+            <button class="btn-upload" id="btn-upload-empty">
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                <path d="M8 10V3M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              Upload Plugin
+            </button>
+          </div>
+        </div>
+
+        <!-- PLUGIN FRAMES (iframes injected per plugin) -->
+        <div id="plugin-frames"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODAL -->
+  <div class="overlay hidden" id="overlay">
+    <div class="upload-modal" id="upload-modal">
+      <div class="um-header">
+        <span class="um-title">Upload Plugin</span>
+        <button class="um-close" id="um-close">&times;</button>
+      </div>
+      <div class="um-body">
+        <div class="drop-zone" id="drop-zone">
+          <svg viewBox="0 0 48 48" fill="none" width="36" height="36">
+            <rect x="4" y="8" width="40" height="32" rx="6" stroke="white" stroke-width="1.2" opacity="0.25"/>
+            <path d="M24 30V18M19 23l5-5 5 5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+          </svg>
+          <p class="dz-title">Drop plugin folder here</p>
+          <p class="dz-sub">or select the entry file</p>
+          <button class="btn-browse" id="btn-browse">Browse file…</button>
+          <input type="file" id="file-input" accept=".html,.htm" style="display:none" />
+        </div>
+        <div class="um-fields">
+          <label class="um-label">Plugin name</label>
+          <input type="text" class="um-input" id="pm-name" placeholder="My Plugin" />
+          <label class="um-label">Description</label>
+          <input type="text" class="um-input" id="pm-desc" placeholder="What does it do?" />
+          <label class="um-label">Accent color</label>
+          <div class="color-row" id="color-row">
+            <span class="cdot active" data-c="#38bdf8" style="background:#38bdf8"></span>
+            <span class="cdot" data-c="#a78bfa" style="background:#a78bfa"></span>
+            <span class="cdot" data-c="#34d399" style="background:#34d399"></span>
+            <span class="cdot" data-c="#f472b6" style="background:#f472b6"></span>
+            <span class="cdot" data-c="#fb923c" style="background:#fb923c"></span>
+            <span class="cdot" data-c="#facc15" style="background:#facc15"></span>
+          </div>
+        </div>
+      </div>
+      <div class="um-footer">
+        <button class="btn-ghost" id="um-cancel">Cancel</button>
+        <button class="btn-primary" id="um-install">Install Plugin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW FOLDER MODAL -->
+  <div class="overlay hidden" id="folder-overlay">
+    <div class="upload-modal" id="folder-modal">
+      <div class="um-header">
+        <span class="um-title">New Folder</span>
+        <button class="um-close" id="fm-close">&times;</button>
+      </div>
+      <div class="um-body">
+        <div class="um-fields" style="margin-top:0">
+          <label class="um-label">Folder name</label>
+          <input type="text" class="um-input" id="fm-name" placeholder="e.g. Tools" />
+          <label class="um-label">Emoji icon</label>
+          <input type="text" class="um-input" id="fm-emoji" placeholder="📁" maxlength="2"/>
+        </div>
+      </div>
+      <div class="um-footer">
+        <button class="btn-ghost" id="fm-cancel">Cancel</button>
+        <button class="btn-primary" id="fm-save">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
