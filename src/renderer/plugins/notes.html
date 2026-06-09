@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--panel:#111;--panel2:#161616;--hover:#1c1c1c;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);
+  --text:rgba(255,255,255,0.88);--text2:rgba(255,255,255,0.45);--text3:rgba(255,255,255,0.18);
+  --yellow:#facc15;--ybg:rgba(250,204,21,0.09);
+  --font:'Inter',-apple-system,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:var(--font)}
+input,textarea{font-family:var(--font)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:4px}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--panel);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-top{padding:14px 12px 10px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:9px}
+.app-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:2px 4px}
+
+.search-wrap{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--bd);
+  border-radius:7px;padding:6px 10px;transition:.15s
+}
+.search-wrap:focus-within{border-color:var(--bd2);background:rgba(255,255,255,0.07)}
+.search-wrap svg{flex-shrink:0;color:var(--text3)}
+.search-wrap input{background:transparent;border:none;outline:none;color:var(--text);font-size:12px;flex:1}
+.search-wrap input::placeholder{color:var(--text3)}
+
+/* Folders */
+.folder-section{padding:8px 8px 4px;border-bottom:1px solid var(--bd)}
+.section-label{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:2px 6px 6px}
+.folder-item{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 8px;border-radius:6px;
+  cursor:pointer;transition:.12s;color:var(--text2);font-size:12px
+}
+.folder-item:hover{background:var(--hover);color:var(--text)}
+.folder-item.active{background:var(--ybg);color:var(--yellow)}
+.fcnt{margin-left:auto;font-size:10.5px;color:var(--text3)}
+.fdel{display:none;background:transparent;border:none;color:var(--text3);font-size:13px;padding:0 2px;cursor:pointer;margin-left:2px}
+.folder-item:hover .fdel{display:block}
+.fdel:hover{color:#f87171}
+.add-folder-btn{
+  display:flex;align-items:center;gap:6px;
+  width:100%;padding:5px 8px;border-radius:6px;
+  background:transparent;border:none;
+  color:var(--text3);font-size:12px;cursor:pointer;transition:.12s
+}
+.add-folder-btn:hover{color:var(--text2);background:var(--hover)}
+
+/* Note list */
+.list-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px 5px
+}
+.list-title{font-size:10.5px;font-weight:500;color:var(--text2);letter-spacing:.3px}
+.new-btn{
+  width:24px;height:24px;border-radius:5px;
+  background:transparent;border:none;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--yellow);font-size:19px;line-height:1;transition:.12s
+}
+.new-btn:hover{background:var(--ybg)}
+
+.note-list{flex:1;overflow-y:auto;padding:0 6px 8px}
+.note-item{
+  padding:9px 10px;border-radius:7px;cursor:pointer;
+  transition:.12s;border:1px solid transparent;margin-bottom:2px;position:relative
+}
+.note-item:hover{background:var(--hover)}
+.note-item.active{background:var(--ybg);border-color:rgba(250,204,21,0.14)}
+.note-item-title{font-size:12.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.note-item.active .note-item-title{color:var(--yellow)}
+.note-item-meta{font-size:10.5px;color:var(--text3);display:flex;gap:7px;white-space:nowrap;overflow:hidden}
+.note-item-preview{overflow:hidden;text-overflow:ellipsis}
+.note-del{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;border-radius:4px;
+  background:rgba(239,68,68,0.1);border:none;
+  color:#f87171;font-size:12px;
+  display:none;align-items:center;justify-content:center;cursor:pointer
+}
+.note-item:hover .note-del{display:flex}
+.list-empty{padding:18px 12px;text-align:center;font-size:11.5px;color:var(--text3);line-height:1.6}
+
+/* ── EDITOR ── */
+.editor{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.editor-empty{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;text-align:center;padding:40px
+}
+.editor-empty p{font-size:13px;color:var(--text3)}
+.editor-empty span{font-size:11.5px;color:var(--text3);opacity:.6}
+
+.editor-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Toolbar */
+.toolbar{
+  display:flex;align-items:center;gap:2px;
+  padding:7px 16px;border-bottom:1px solid var(--bd);flex-shrink:0
+}
+.tb{
+  width:28px;height:28px;border-radius:5px;
+  background:transparent;border:none;
+  color:var(--text2);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  transition:.12s
+}
+.tb:hover{background:var(--hover);color:var(--text)}
+.tb.on{background:var(--ybg);color:var(--yellow)}
+.tb-sep{width:1px;height:18px;background:var(--bd);margin:0 4px;flex-shrink:0}
+.tb-right{margin-left:auto;font-size:10.5px;color:var(--text3)}
+
+.note-title{
+  width:100%;padding:18px 24px 6px;
+  background:transparent;border:none;outline:none;
+  font-size:23px;font-weight:600;color:var(--text);flex-shrink:0
+}
+.note-title::placeholder{color:var(--text3)}
+
+.note-date{
+  padding:0 24px 12px;font-size:11px;color:var(--text3);
+  border-bottom:1px solid var(--bd);flex-shrink:0
+}
+
+.note-body{
+  flex:1;width:100%;
+  padding:16px 24px 24px;
+  background:transparent;border:none;outline:none;
+  font-size:14px;line-height:1.78;color:var(--text);
+  resize:none;overflow-y:auto;caret-color:var(--yellow)
+}
+.note-body::placeholder{color:var(--text3)}
+.note-body:empty::before{content:attr(data-ph);color:var(--text3);pointer-events:none}
+.note-body blockquote{border-left:3px solid var(--yellow);padding-left:14px;color:var(--text2);margin:8px 0}
+.note-body h2{font-size:18px;font-weight:600;margin:12px 0 4px}
+.note-body ul,.note-body ol{padding-left:22px}
+.note-body li{margin:3px 0}
+
+/* ── FOLDER MODAL ── */
+.fm-overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center
+}
+.fm-overlay.open{display:flex}
+.fm-box{
+  background:#141414;border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;width:300px;padding:20px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.6);
+  animation:mIn .2s cubic-bezier(.34,1.56,.64,1) both
+}
+@keyframes mIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.fm-title{font-size:13.5px;font-weight:600;margin-bottom:14px}
+.fm-inp{
+  width:100%;padding:8px 11px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--bd);
+  border-radius:6px;color:var(--text);font-size:13px;outline:none;
+  margin-bottom:10px;transition:.15s
+}
+.fm-inp:focus{border-color:var(--bd2)}
+.fm-inp::placeholder{color:var(--text3)}
+.fm-row{display:flex;justify-content:flex-end;gap:8px}
+.fm-cancel{background:transparent;border:1px solid var(--bd);color:var(--text2);border-radius:6px;padding:6px 14px;font-size:12px;transition:.12s}
+.fm-cancel:hover{border-color:var(--bd2);color:var(--text)}
+.fm-save{background:var(--yellow);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;transition:.12s}
+.fm-save:hover{background:#fde047}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="app-title">
+        <svg viewBox="0 0 18 18" fill="none" width="17" height="17">
+          <rect x="1" y="1" width="16" height="16" rx="3.5" fill="#facc15" opacity="0.14"/>
+          <path d="M4 5h10M4 8.5h10M4 12h6.5" stroke="#facc15" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Notes
+      </div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M10.5 10.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input id="search" type="text" placeholder="Search notes…"/>
+      </div>
+    </div>
+
+    <div class="folder-section">
+      <div class="section-label">Folders</div>
+      <div id="folder-list"></div>
+      <button class="add-folder-btn" id="add-folder-btn">
+        <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        New Folder
+      </button>
+    </div>
+
+    <div class="list-header">
+      <span class="list-title" id="list-label">ALL NOTES</span>
+      <button class="new-btn" id="new-btn" title="New note">+</button>
+    </div>
+    <div class="note-list" id="note-list"></div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor">
+
+    <div class="editor-empty" id="editor-empty">
+      <svg viewBox="0 0 60 60" fill="none" width="64" height="64" opacity=".12">
+        <rect x="6" y="4" width="48" height="52" rx="6" stroke="white" stroke-width="1.5"/>
+        <path d="M16 20h28M16 28h28M16 36h18" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="44" cy="44" r="10" fill="#facc15"/>
+        <path d="M41 44h6M44 41v6" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>Select a note or create a new one</p>
+      <span>Cmd/Ctrl + N for a new note</span>
+    </div>
+
+    <div class="editor-main" id="editor-main" style="display:none">
+      <div class="toolbar">
+        <button class="tb" data-cmd="bold"           title="Bold"><b>B</b></button>
+        <button class="tb" data-cmd="italic"         title="Italic"><i>I</i></button>
+        <button class="tb" data-cmd="underline"      title="Underline"><u>U</u></button>
+        <div class="tb-sep"></div>
+        <button class="tb" data-cmd="insertUnorderedList" title="Bullet list">
+          <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><circle cx="2" cy="4" r="1.2" fill="currentColor"/><circle cx="2" cy="8" r="1.2" fill="currentColor"/><circle cx="2" cy="12" r="1.2" fill="currentColor"/><path d="M5 4h8M5 8h8M5 12h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="tb" data-cmd="insertOrderedList" title="Numbered list">
+          <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M2 3h1.5v4H2M2 10h2l-2 3h2" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 5h7M6 11.5h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="tb-sep"></div>
+        <button class="tb" data-cmd="formatBlock" data-val="h2" title="Heading">
+          <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M2 3v8M7 3v8M2 7h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10 9l1.5-2V12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tb" data-cmd="formatBlock" data-val="blockquote" title="Quote">
+          <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M3 3.5C2 6 2 9 3.5 11M7 3.5C6 6 6 9 7.5 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+        <div class="tb-sep"></div>
+        <button class="tb" id="pin-btn" title="Pin note">
+          <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M9 1.5l3 3-2 2-1-1-3 3 1 1-2 2-3-3 2-2 1 1 3-3-1-1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 12l3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <span class="tb-right" id="wc">0 words</span>
+      </div>
+
+      <input  type="text" class="note-title" id="note-title" placeholder="Title" spellcheck="false"/>
+      <div class="note-date" id="note-date"></div>
+      <div class="note-body" id="note-body" contenteditable="true" spellcheck="true" data-ph="Start writing…"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Folder modal -->
+<div class="fm-overlay" id="fm-overlay">
+  <div class="fm-box">
+    <div class="fm-title">New Folder</div>
+    <input type="text" class="fm-inp" id="fm-name" placeholder="Folder name"/>
+    <input type="text" class="fm-inp" id="fm-emoji" placeholder="Emoji (optional)" maxlength="2"/>
+    <div class="fm-row">
+      <button class="fm-cancel" id="fm-cancel">Cancel</button>
+      <button class="fm-save"   id="fm-save">Create</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'kiwi-notes';
+const uid = () => Math.random().toString(36).slice(2,10);
+const $   = id => document.getElementById(id);
+
+let st = { notes:[], folders:[], activeId:null, folderFilter:'all', search:'' };
+
+/* load */
+try { const d=JSON.parse(localStorage.getItem(KEY)||'{}'); st.notes=d.notes||[]; st.folders=d.folders||[]; } catch(e){}
+
+/* seed */
+if (!st.notes.length) {
+  st.notes.push({ id:uid(), title:'Welcome to Notes 👋', body:`<p>This is your personal notepad inside <b>Kiwi Board</b>.</p><p><br></p><h2>What you can do</h2><ul><li>Create notes and organise them in <b>folders</b></li><li>Format text: <b>bold</b>, <i>italic</i>, headings, lists, blockquotes</li><li>Pin important notes to the top</li><li>Search across all your notes instantly</li></ul><p><br></p><p>Hit <b>+</b> in the sidebar or press <b>Cmd/Ctrl+N</b> to create a new note.</p>`, folderId:null, pinned:true, createdAt:Date.now(), updatedAt:Date.now() });
+  save();
+}
+
+function save() { localStorage.setItem(KEY, JSON.stringify({notes:st.notes, folders:st.folders})); }
+
+/* ── RENDER ── */
+function renderAll() { renderFolders(); renderList(); }
+
+function renderFolders() {
+  const fl = $('folder-list'); fl.innerHTML='';
+  const mkRow = (id, emoji, label, cnt) => {
+    const el=document.createElement('div'); el.className='folder-item'+(st.folderFilter===id?' active':'');
+    el.innerHTML=`<span>${emoji}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span><span class="fcnt">${cnt}</span>`;
+    el.addEventListener('click', ()=>{ st.folderFilter=id; $('list-label').textContent=label.toUpperCase(); renderFolders(); renderList(); });
+    return el;
+  };
+  fl.appendChild(mkRow('all','📋','All Notes', st.notes.length));
+  const pinned = st.notes.filter(n=>n.pinned).length;
+  if (pinned) fl.appendChild(mkRow('pinned','📌','Pinned', pinned));
+  st.folders.forEach(f => {
+    const cnt = st.notes.filter(n=>n.folderId===f.id).length;
+    const el = mkRow(f.id, f.emoji||'📁', f.name, cnt);
+    const del = document.createElement('button'); del.className='fdel'; del.textContent='×';
+    del.addEventListener('click', e=>{ e.stopPropagation(); st.notes.forEach(n=>{ if(n.folderId===f.id) n.folderId=null; }); st.folders=st.folders.filter(x=>x.id!==f.id); if(st.folderFilter===f.id) st.folderFilter='all'; save(); renderAll(); });
+    el.appendChild(del);
+    fl.appendChild(el);
+  });
+}
+
+function renderList() {
+  const nl=$('note-list'); nl.innerHTML='';
+  let list=[...st.notes];
+  if (st.folderFilter==='pinned') list=list.filter(n=>n.pinned);
+  else if (st.folderFilter!=='all') list=list.filter(n=>n.folderId===st.folderFilter);
+  if (st.search) { const q=st.search.toLowerCase(); list=list.filter(n=>n.title.toLowerCase().includes(q)||strip(n.body).toLowerCase().includes(q)); }
+  list.sort((a,b)=>(b.pinned-a.pinned)||b.updatedAt-a.updatedAt);
+  if (!list.length) { nl.innerHTML='<div class="list-empty">'+(st.search?'No results':'No notes here yet')+'</div>'; return; }
+  list.forEach(n=>{
+    const el=document.createElement('div'); el.className='note-item'+(st.activeId===n.id?' active':'');
+    const prev=strip(n.body).slice(0,50)||'No additional text';
+    el.innerHTML=`<div class="note-item-title">${n.pinned?'📌 ':''}${n.title||'Untitled'}</div><div class="note-item-meta"><span>${fmtDate(n.updatedAt)}</span><span class="note-item-preview">${prev}</span></div><button class="note-del">×</button>`;
+    el.addEventListener('click', e=>{ if(!e.target.classList.contains('note-del')) selectNote(n.id); });
+    el.querySelector('.note-del').addEventListener('click', e=>{ e.stopPropagation(); deleteNote(n.id); });
+    nl.appendChild(el);
+  });
+}
+
+const strip = html => { const d=document.createElement('div'); d.innerHTML=html||''; return d.textContent||''; };
+const fmtDate = ts => { const d=new Date(ts),n=new Date(); if(d.toDateString()===n.toDateString()) return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); if(n-d<7*864e5) return d.toLocaleDateString([],{weekday:'short'}); return d.toLocaleDateString([],{month:'short',day:'numeric'}); };
+
+/* ── SELECT NOTE ── */
+let saveTimer=null;
+function selectNote(id) {
+  flush();
+  st.activeId=id;
+  const n=st.notes.find(x=>x.id===id);
+  renderList();
+  if (!n) { showEmpty(); return; }
+  showEditor();
+  $('note-title').value = n.title;
+  $('note-body').innerHTML = n.body||'';
+  $('note-date').textContent = 'Last edited ' + new Date(n.updatedAt).toLocaleString([],{weekday:'long',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  $('pin-btn').classList.toggle('on', !!n.pinned);
+  updateWC();
+  $('note-body').focus();
+}
+function showEmpty()  { $('editor-empty').style.display='flex'; $('editor-main').style.display='none'; }
+function showEditor() { $('editor-empty').style.display='none'; $('editor-main').style.display='flex'; }
+
+/* ── SAVE ── */
+function schedule() { clearTimeout(saveTimer); saveTimer=setTimeout(flush,500); }
+function flush() {
+  clearTimeout(saveTimer);
+  if (!st.activeId) return;
+  const n=st.notes.find(x=>x.id===st.activeId); if(!n) return;
+  n.title=$('note-title').value||'Untitled';
+  n.body=$('note-body').innerHTML;
+  n.updatedAt=Date.now();
+  save(); renderList();
+  $('note-date').textContent='Last edited '+new Date(n.updatedAt).toLocaleString([],{weekday:'long',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  updateWC();
+}
+$('note-title').addEventListener('input', schedule);
+$('note-body').addEventListener('input', schedule);
+
+function updateWC() { const t=strip($('note-body').innerHTML).trim(); const w=t?t.split(/\s+/).length:0; $('wc').textContent=w+' word'+(w!==1?'s':''); }
+
+/* ── NEW / DELETE ── */
+function newNote() {
+  flush();
+  const n={ id:uid(), title:'', body:'', folderId: st.folderFilter!=='all'&&st.folderFilter!=='pinned'?st.folderFilter:null, pinned:false, createdAt:Date.now(), updatedAt:Date.now() };
+  st.notes.unshift(n); save(); selectNote(n.id); setTimeout(()=>$('note-title').focus(),50);
+}
+function deleteNote(id) {
+  st.notes=st.notes.filter(n=>n.id!==id); save();
+  if (st.activeId===id) { st.activeId=st.notes[0]?.id||null; st.activeId?selectNote(st.activeId):showEmpty(); }
+  renderList();
+}
+
+$('new-btn').addEventListener('click', newNote);
+
+/* ── PIN ── */
+$('pin-btn').addEventListener('click', ()=>{
+  const n=st.notes.find(x=>x.id===st.activeId); if(!n) return;
+  n.pinned=!n.pinned; save(); $('pin-btn').classList.toggle('on',n.pinned); renderFolders(); renderList();
+});
+
+/* ── TOOLBAR ── */
+document.querySelectorAll('.tb[data-cmd]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const cmd=btn.dataset.cmd, val=btn.dataset.val;
+    document.execCommand(cmd, false, val||null);
+    $('note-body').focus(); schedule();
+  });
+});
+
+/* ── SEARCH ── */
+$('search').addEventListener('input', e=>{ st.search=e.target.value; renderList(); });
+
+/* ── FOLDER MODAL ── */
+$('add-folder-btn').addEventListener('click',()=>{ $('fm-name').value=''; $('fm-emoji').value=''; $('fm-overlay').classList.add('open'); setTimeout(()=>$('fm-name').focus(),60); });
+$('fm-cancel').addEventListener('click', ()=>$('fm-overlay').classList.remove('open'));
+$('fm-save').addEventListener('click', ()=>{
+  const name=$('fm-name').value.trim(); if(!name){$('fm-name').focus();return;}
+  st.folders.push({id:uid(),name,emoji:$('fm-emoji').value.trim()||'📁'});
+  save(); $('fm-overlay').classList.remove('open'); renderFolders();
+});
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e=>{
+  const mac=e.metaKey||e.ctrlKey;
+  if(mac&&e.key==='n'){e.preventDefault();newNote();}
+  if(mac&&e.key==='s'){e.preventDefault();flush();}
+  if(e.key==='Escape') $('fm-overlay').classList.remove('open');
+});
+window.addEventListener('beforeunload', flush);
+
+/* ── BOOT ── */
+renderAll();
+if (st.notes.length) selectNote(st.notes[0].id); else showEmpty();
+</script>
+</body>
+</html>

@@ -75,4 +75,3 @@ kiwi-board/
 ---
 
 *Made for Kiwi. Not for anyone else.*
-# Kiwi-Board
